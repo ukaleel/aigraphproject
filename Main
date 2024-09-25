@@ -1,15 +1,37 @@
+# Library import statements
+
+import random
+
+
 # Create a Node class to create a node
+
 class Node:
     def __init__(self, data):
         self.data = data # the number of the node
         self.next = None
         self.links = [] # links associated with node
+        self.priorNode = []
+        self.pathToNode = []
 
 
 # Create a LinkedList class
 class LinkedList:
     def __init__(self):
         self.head = None
+
+    #CUSTOM METHOD
+
+    # modify the links of a node
+    def addLinks(self, data, newData):
+        current = self.head
+
+        while current:
+            if current.data == data:
+                if newData not in current.links:
+                    current.links.append(newData)
+                break
+            current = current.next
+
 
     # Method to add a node at begin of LL
     def insertAtBegin(self, data):
@@ -145,6 +167,15 @@ class LinkedList:
             current_node = current_node.next
 
 
+    #CUSTOM
+    # debugging print method
+    def printLinks(self):
+        current_node = self.head
+        while (current_node):
+            print("Node ",current_node.data, " is connected to ", current_node.links)
+            current_node = current_node.next
+
+
 def createMapNodes():
     file = open("hw3_cost239.txt", "r")
 
@@ -155,7 +186,7 @@ def createMapNodes():
         try:
             val1 = int(nodeValues[0])
             val2 = int(nodeValues[1])
-            print(val1, val2)
+            #print(val1, val2)
 
             current = mapNodes.head
             found_val1 = False
@@ -166,15 +197,67 @@ def createMapNodes():
                 if current.data == val2:
                     found_val2 = True
                 current = current.next
-            
-          
-        except:a
+            if not found_val1 and found_val2:
+                mapNodes.insertAtEnd(val1)
+            elif found_val1 and not found_val2:
+                mapNodes.insertAtEnd(val2)
+            elif not found_val1 and not found_val2:
+                mapNodes.insertAtEnd(val1)
+                mapNodes.insertAtEnd(val2)
+
+            mapNodes.addLinks(val1, val2)
+            mapNodes.addLinks(val2, val1)
+
+        except:
             print("Not an integer")
-
-    mapNodes.printLL()
-
+    #mapNodes.printLL()
+    mapNodes.printLinks()
         #print(nodeValues)
+    return mapNodes
+
+def extractUserInfo():
+    desiredNodesList = []
+
+    while True:
+        try:
+            initialNode = int(input("What node would you like to begin the graph traversal with?\n"))
+            if initialNode >=0 and initialNode <= 18:
+                break
+            else:
+                print("Please enter a numerical option from 0 through 18")
+                continue
+
+        except:
+            print("Please enter a numerical option from 0 through 18")
+
+    while True:
+        desiredNode = input("Please enter the node # you would like to traverse individually. Type 'done' when "
+                            "you are finished. \n")
+        while desiredNodesList == None and desiredNode.lower() == "done":
+            desiredNode = input("Please enter a valid option. \n")
+        if desiredNode.lower() == "done":
+            break
+        desiredNode = int(desiredNode)
+
+        if desiredNode == initialNode:
+            print("The graph will begin at the initial node, please select another node. \n")
+        elif desiredNode >= 0 and desiredNode <= 18 and desiredNode not in desiredNodesList:
+            desiredNodesList.append(desiredNode)
+        elif desiredNode >= 0 and desiredNode <= 18 and desiredNode in desiredNodesList:
+            print("Node has already been noted as a node to traverse. \n")
+        else:
+            print("Please enter a numerical option from 0 through 18")
+
+
+    print("Initial node is ",initialNode)
+    print("Desired nodes to travel to ",desiredNodesList)
+
+    return initialNode, desiredNodesList
+
+def graphTraversal():
+    mapNodes = createMapNodes()
+    initialNode, desiredNodesList = extractUserInfo()
 
 
 
-createMapNodes()
+graphTraversal()
